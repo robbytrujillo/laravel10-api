@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 // import API Resurce "PostResource"
 use App\Http\Resources\PostResource;
 
+// import Facade "Storage"
+use Illuminate\Support\Facades\Storage;
+
 // import Facade "Validator"
 use Illuminate\Support\Facades\Validator;
 
@@ -75,5 +78,25 @@ class PostController extends Controller
 
         // return single post as a resource
         return new PostResource(true, 'Detail Data Post', $post);
+    }
+
+    /**
+     * update
+     * 
+     * @param mixed $request
+     * @param mixed $post
+     * @return void
+     */
+    public function update(Request $request, $id) {
+        // define validation rules
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'content' => 'required',
+        ]);
+
+        // check if validation fails
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
     }
 }
