@@ -38,9 +38,28 @@ class PostController extends Controller
     public function store(Request $request) {
         // define validation rules
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image\mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'title' => 'required',
             'content' => 'required',
         ]);
+
+        // check if validation fails
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // upload image
+        $image = $request->file('image');
+        $image->storeAs('public/posts', $image->hashName());
+
+        // create post
+        $post = Post::create([
+            'image' => $image->hashName(),
+            'title' => $request->title,
+            'content' => $request->content,
+        ]);
+
+        // return resposne
+        return new PostResource(true, 'Data berhasil ditambahkan!', $post);
     }
 }
